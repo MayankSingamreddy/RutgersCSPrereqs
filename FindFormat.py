@@ -5,7 +5,7 @@ import requests
 
 from bs4 import BeautifulSoup
 
-urls = ['https://www.cs.rutgers.edu/academics/undergraduate/electives']
+urls = ['https://catalogs.rutgers.edu/generated/nb-ug_current/pg442.html']
 
 i = 0
 

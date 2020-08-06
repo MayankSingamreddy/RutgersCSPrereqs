@@ -43,7 +43,7 @@ i = 0
 
 outside = []
 
-'''
+
 placementCheck = False
 corequisiteCheck = False
 
@@ -224,24 +224,21 @@ for url in urlsEE:
 
 
 
-'''
 
-'''REMEMBER TO ADD THE INDENT BACK TO EVERYTHING AFTER UNCOMMENTING'''
+urlsMath = ['https://math.rutgers.edu/academics/undergraduate/courses/964-01-640-355-game-theory',
+          'https://math.rutgers.edu/academics/undergraduate/courses/986-01-640-454-combinatorics',
+          'https://math.rutgers.edu/academics/undergraduate/courses/987-01-640-461-mathematical-logic',
+          'https://math.rutgers.edu/academics/undergraduate/courses/985-01-640-453-theory-of-linear-optimization',
+          'https://math.rutgers.edu/academics/undergraduate/courses/963-01-640-354-linear-optimization',
+          'https://math.rutgers.edu/academics/undergraduate/courses/977-01-640-428-graph-theory']
 
-mathClasses = ['01:640:338 Discrete and Probabilistic Models in Biology',
-               '01:640:348 Cryptography',
-               '01:640:354 Linear Optimization (3)',
-               '01:640:428 Graph Theory (3)',
-               '01:640:453',
-               '01:640:454',
-               '01:640:461']
 
 placementCheck = False
+digitCheck = False
 
-for className in mathClasses:
-    outside.append([className[:11],[], 'Mathematics'])
+for url in urlsMath:
+    outside.append(['',[], 'Mathematics'])
 
-    url = 'https://catalogs.rutgers.edu/generated/nb-ug_current/pg442.html'
     res = requests.get(url)
     html_page = res.content
     soup = BeautifulSoup(html_page, 'html.parser')
@@ -273,34 +270,22 @@ for className in mathClasses:
 
     y = 0
     for line in brackets:
-        if(className in line):
-            ctr = y +1
-            while("Prerequisite" not in brackets[ctr]):
-                ctr+=1
-
-            doc = nlp(brackets[ctr+1])
+        if("Courses" in line):
+            if('01:' in brackets[y+1]):
+                outside[i][0] = brackets[y+1][:11]
+        if("Prerequisite" in line):
+            prereqPos = line.find(':')
+            doc = nlp(brackets[y][prereqPos:])
             for token in doc:
-                if token.text == '.':
+                if(token.text == '.'):
                     break
-                if( token.text == ':' or token.text == "(" or token.text == ')' or token.text == 'either' or token.text == 'permission' or token.text == 'of' or token.text == 'department'):
+                if(any(char.isdigit() for char in token.text) == False):
                     continue
                 else:
                     outside[i][1].append(token.text)
-            if("Corequisite:" in brackets[ctr+2]):
-                if("01:" in brackets[ctr+2]):
-                    doc = nlp(brackets[ctr+2])
-                    for token in doc:
-                        if(token.text == '.'):
-                            break
-                        if("01:" in token.text):
-                            outside[i][1].append(token.text)
-                elif("01:" in brackets[ctr+3]):
-                    doc = nlp(brackets[ctr+3])
-                    for token in doc:
-                        if(token.text == '.'):
-                            break
-                        if("01:" in token.text):
-                            outside[i][1].append(token.text)
+
+
+
 
         #end of line loop
         y+=1
@@ -308,6 +293,8 @@ for className in mathClasses:
     #end of url loop
     i+=1
 
+outside.append(['01:640:338',['01:640:250','01:640:251','01:640:477', '01:198:206', '01:960:381'], 'Mathematics'])
+outside.append(['01:640:348', ['01:640:250','01:640:300','01:640:356','01:640:477'],'Mathematics'])
 
 
 

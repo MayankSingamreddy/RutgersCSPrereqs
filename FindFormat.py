@@ -5,7 +5,7 @@ import requests
 
 from bs4 import BeautifulSoup
 
-urls = ['https://math.rutgers.edu/academics/undergraduate/courses/987-01-640-461-mathematical-logic']
+urls = ['https://statistics.rutgers.edu/course-descriptions/516-01-960-463-regression-methods-3']
 
 i = 0
 

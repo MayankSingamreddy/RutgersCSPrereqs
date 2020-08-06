@@ -48,7 +48,7 @@ placementCheck = False
 corequisiteCheck = False
 
 for url in urls:
-    outside.append([' ',[],'Computer Science'])
+    outside.append([' ',[],'Computer Science',i])
 
     res = requests.get(url)
     html_page = res.content
@@ -126,10 +126,10 @@ for url in urls:
     #end of url loop
     i+=1
 
+#END OF COMP SCI
 
 
-
-
+#START OF Electrical Engineering
 
 urlsEE = ['https://www.ece.rutgers.edu/14332376-virtual-reality',
           'https://www.ece.rutgers.edu/14332424-introduction-information-and-network-security',
@@ -143,7 +143,7 @@ urlsEE = ['https://www.ece.rutgers.edu/14332376-virtual-reality',
 placementCheck = False
 
 for url in urlsEE:
-    outside.append([' ',[], 'Electrical Engineering'])
+    outside.append([' ',[], 'Electrical Engineering',i])
 
     res = requests.get(url)
     html_page = res.content
@@ -219,11 +219,11 @@ for url in urlsEE:
     #end of url loop
     i+=1
 
+#end of Electrical Engineering
 
 
 
-
-
+#START OF Mathematics
 
 urlsMath = ['https://math.rutgers.edu/academics/undergraduate/courses/964-01-640-355-game-theory',
           'https://math.rutgers.edu/academics/undergraduate/courses/986-01-640-454-combinatorics',
@@ -232,12 +232,11 @@ urlsMath = ['https://math.rutgers.edu/academics/undergraduate/courses/964-01-640
           'https://math.rutgers.edu/academics/undergraduate/courses/963-01-640-354-linear-optimization',
           'https://math.rutgers.edu/academics/undergraduate/courses/977-01-640-428-graph-theory']
 
-
 placementCheck = False
 digitCheck = False
 
 for url in urlsMath:
-    outside.append(['',[], 'Mathematics'])
+    outside.append(['',[], 'Mathematics',i])
 
     res = requests.get(url)
     html_page = res.content
@@ -284,17 +283,177 @@ for url in urlsMath:
                 else:
                     outside[i][1].append(token.text)
 
-
-
-
         #end of line loop
         y+=1
 
     #end of url loop
     i+=1
 
-outside.append(['01:640:338',['01:640:250','01:640:251','01:640:477', '01:198:206', '01:960:381'], 'Mathematics'])
-outside.append(['01:640:348', ['01:640:250','01:640:300','01:640:356','01:640:477'],'Mathematics'])
+outside.append(['01:640:338',['01:640:250','01:640:251','01:640:477', '01:198:206', '01:960:381'], 'Mathematics',i])
+i+=1
+outside.append(['01:640:348', ['01:640:250','01:640:300','01:640:356','01:640:477'],'Mathematics',i])
+i+=1
+#END OF Mathematics
+
+
+
+#START OF Philosophy
+
+url = 'https://catalogs.rutgers.edu/generated/nb-ug_0507/pg20657.html'
+res = requests.get(url)
+html_page = res.content
+soup = BeautifulSoup(html_page, 'html.parser')
+text = soup.find_all(text=True)
+
+output = ''
+blacklist = [
+    '[document]',
+    'noscript',
+    'header',
+    'html',
+    'meta',
+    'head',
+    'input',
+    'script',
+    # there may be more elements you don't want, such as "style", etc.
+]
+
+for t in text:
+    if t.parent.name not in blacklist:
+        output += '{} '.format(t)
+
+brackets = []
+doc = nlp(output)
+for sent in doc.sents:
+    brackets.append(sent.text.rstrip().replace(u'\xa0', u' ').replace(u'\n', u'').replace(u'\t',u' '))
+
+
+namesPhil = ['Applied Symbolic Logic',
+             '01:730:407 Intermediate Logic I (3)',
+             '01:730:408 Intermediate Logic II (3)',
+             '01:730:329 Minds, Machines, and Persons (3)',
+             '01:730:424']
+
+for name in namesPhil:
+    outside.append(['',[], 'Philosophy',i])
+
+    if("01:" not in name):
+        outside[i][0] = '01:730:315'
+    if("01:" in name):
+        namePos = name.find("01:")
+        outside[i][0] = name[namePos:namePos+11]
+
+
+    y = 0
+    for line in brackets:
+        if(name in line):
+            ctr = y
+            while("Prerequisite" not in brackets[ctr]):
+                ctr+=1
+            if("01:" in brackets[ctr]):
+                doc = nlp(brackets[ctr])
+                for token in doc:
+                    if(any(char.isdigit() for char in token.text)):
+                        outside[i][1].append(token.text)
+                    if(token.text == '.'):
+                        break
+            elif("01:" in brackets[ctr+1]):
+                doc = nlp(brackets[ctr+1])
+                for token in doc:
+                    if(any(char.isdigit() for char in token.text)):
+                        outside[i][1].append(token.text)
+                    if(token.text == '.'):
+                        break
+        y+=1
+
+    #end of url loop
+    i+=1
+
+
+#end of Philosophy
+
+
+
+
+
+#start of Linguistics
+outside.append(['01:615:441', ['(B) Course','01:615:305','01:615:315','01:615:325','01:615:350'],'Linguistics',i])
+i+=1
+#end of Linguistics
+
+
+
+
+#start of statistics
+
+urlsStats = ['https://statistics.rutgers.edu/course-descriptions/511-01-960-384-intermediate-statistical-analysis-3-formerly-960-380',
+          'https://statistics.rutgers.edu/course-descriptions/518-01-960-476-introduction-to-sampling-3',
+          'https://statistics.rutgers.edu/course-descriptions/516-01-960-463-regression-methods-3',
+          'https://statistics.rutgers.edu/course-descriptions/521-01-960-486-computing-and-graphics-in-applied-statistics-3']
+
+placementCheck = False
+digitCheck = False
+
+for url in urlsStats:
+    outside.append(['',[], 'Statistics', i])
+
+    res = requests.get(url)
+    html_page = res.content
+    soup = BeautifulSoup(html_page, 'html.parser')
+    text = soup.find_all(text=True)
+
+    output = ''
+    blacklist = [
+    	'[document]',
+    	'noscript',
+    	'header',
+    	'html',
+    	'meta',
+    	'head',
+    	'input',
+    	'script',
+    	# there may be more elements you don't want, such as "style", etc.
+    ]
+
+    for t in text:
+    	if t.parent.name not in blacklist:
+    		output += '{} '.format(t)
+
+    brackets = []
+    doc = nlp(output)
+    for sent in doc.sents:
+        brackets.append(sent.text.rstrip().replace(u'\xa0', u' ').replace(u'\n', u'').replace(u'\t',u' '))
+
+    #print(brackets)
+
+    y = 0
+    for line in brackets:
+        if(y==0):
+            outside[i][0] = line[0:11]
+        if("Prerequisite" in line):
+            prereqPos = line.find(':')
+            doc = nlp(brackets[y][prereqPos:])
+            for token in doc:
+                if(token.text == '.'):
+                    break
+                if(any(char.isdigit() for char in token.text) == False):
+                    continue
+                else:
+                    outside[i][1].append(token.text)
+
+        #end of line loop
+        y+=1
+    if not outside[i][1]:
+        outside[i][1].append('Level 2')
+    #end of url loop
+    i+=1
+
+
+#END OF Statistics
+
+
+
+
 
 
 

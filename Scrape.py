@@ -492,7 +492,7 @@ for url in urlsStats:
                 counter-=1
 '''
 
-'''
+
 final = []
 
 finalCtr = 0
@@ -502,7 +502,7 @@ for anElement in classes:
     final[finalCtr][2] = anElement[2]
     final[finalCtr][3] = anElement[3]
     for singleElem in anElement[1]:
-        if(any(char.isdigit() for char in singleElem)):
+        if(any(char.isdigit() for char in singleElem) and singleElem != 'Level 2' and anElement[2] == "Statistics"):
             count = 0
             for ab in singleElem:
                 if ab == ':':
@@ -514,12 +514,25 @@ for anElement in classes:
                 final[finalCtr][1].append("01:" + singleElem)
             if(count == 2):
                 final[finalCtr][1].append(singleElem)
+        elif(any(char.isdigit() for char in singleElem) and anElement[2] == "Philosophy"):
+            count = 0
+            for ab in singleElem:
+                if ab == ':':
+                    count = count + 1
+
+            if(count == 0):
+                final[finalCtr][1].append("01:730:" + singleElem)
+            if(count == 1):
+                final[finalCtr][1].append("01:" + singleElem)
+            if(count == 2):
+                final[finalCtr][1].append(singleElem)
         else:
             final[finalCtr][1].append(singleElem)
 
 
-print(classes)
-'''
+
+    finalCtr+=1
+
 
 
 

@@ -14,7 +14,8 @@ urls = ['https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/cour
         'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-213-software-methodology',
         'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-214-systems-programming',
         'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-314-principles-of-programming-languages',
-        'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-323-numerical-analysis-and-computinghttps://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-324-numerical-methods',
+        'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-323-numerical-analysis-and-computing',
+        'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-324-numerical-methods',
         'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-334-introduction-to-imaging-and-multimedia',
         'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-336-principles-of-information-and-data-management',
         'https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/course-details/01-198-352-internet-technology',
@@ -41,14 +42,14 @@ urls = ['https://www.cs.rutgers.edu/academics/undergraduate/course-synopses/cour
 
 i = 0
 
-outside = []
+classes = []
 
 
 placementCheck = False
 corequisiteCheck = False
 
 for url in urls:
-    outside.append([' ',[],'Computer Science',i])
+    classes.append([' ',[],'Computer Science',i])
 
     res = requests.get(url)
     html_page = res.content
@@ -84,21 +85,27 @@ for url in urls:
         if("Course Details" in line):
             if(":" in line):
                 pos_courseCode = line.find(':')-2
-                outside[i][0] = line[pos_courseCode : pos_courseCode+11]
+                classes[i][0] = line[pos_courseCode : pos_courseCode+11]
             else:
                 pos_courseCode = brackets[y+1].find(':')-2
-                outside[i][0] = brackets[y+1][pos_courseCode : pos_courseCode+11]
+                classes[i][0] = brackets[y+1][pos_courseCode : pos_courseCode+11]
         if("Prerequisite information:" in line):
             if(":" in line):
                 doc = nlp(line)
                 for token in doc:
                     if('01:' in token.text):
-                        outside[i][1].append(token.text)
+                        classes[i][1].append(token.text)
             doc = nlp(brackets[y+1])
             for token in doc:
+                if('CALC1' in token.text):
+                    classes[i][1].append("01:640:151")
+                    continue
+                if('CALC2' in token.text):
+                    classes[i][1].append("01:640:152")
+                    continue
                 if(token.text=='-' or token.text =='A' or token.text == 'Credit' or token.text =='('):
                     break
-                if(token.text == "or" or token.text == ";" or token.text == "in" or token.text == "." or token.text == " " or token.text == '†' or token.text == ':'):
+                if(token.text == "or" or token.text == ";" or token.text == "in" or token.text == "." or token.text == " " or token.text == '†' or token.text == ':' or token.text == 'Corequisite'):
                     continue
                 if(token.text == 'placement'):
                     placementCheck = True
@@ -107,21 +114,26 @@ for url in urls:
                     corequisiteCheck = True
                     continue
                 if(token.text == 'Permission'):
-                    outside[i][1].append("Permission from Instructor")
+                    classes[i][1].append("Permission")
                     break
                 if(":" in token.text and corequisiteCheck == True):
-                    outside[i][1].append("Corequisite: " + token.text)
+                    classes[i][1].append(token.text)
                     corequisiteCheck = False
                 else:
                     if(placementCheck==True):
-                        outside[i][1].append("placement in " + token.text)
+                        classes[i][1].append(token.text)
                         placementCheck = False
                     else:
-                        outside[i][1].append(token.text)
+                        classes[i][1].append(token.text)
 
 
         #end of line loop
         y+=1
+
+    #for(items in outside[i][1]):
+
+
+
 
     #end of url loop
     i+=1
@@ -143,7 +155,7 @@ urlsEE = ['https://www.ece.rutgers.edu/14332376-virtual-reality',
 placementCheck = False
 
 for url in urlsEE:
-    outside.append([' ',[], 'Electrical Engineering',i])
+    classes.append([' ',[], 'Electrical Engineering',i])
 
     res = requests.get(url)
     html_page = res.content
@@ -179,10 +191,10 @@ for url in urlsEE:
         if("You are here" in line):
             if(":" in brackets[y+2]):
                 pos_courseCode = brackets[y+2].find(':')-2
-                outside[i][0] = brackets[y+2][pos_courseCode : pos_courseCode+11]
+                classes[i][0] = brackets[y+2][pos_courseCode : pos_courseCode+11]
             elif(':' in brackets[y+3]):
                 pos_courseCode = brackets[y+3].find(':')-2
-                outside[i][0] = brackets[y+3][pos_courseCode : pos_courseCode+11]
+                classes[i][0] = brackets[y+3][pos_courseCode : pos_courseCode+11]
         if("Pre-Requisite courses:" in line):
             if('14:' in line or '01:' in line):
                 doc = nlp(line)
@@ -190,14 +202,14 @@ for url in urlsEE:
                     if('14:' not in token.text and '01:' not in token.text):
                         continue
                     if('14:' in token.text or '01:' in token.text):
-                        outside[i][1].append(token.text)
+                        classes[i][1].append(token.text)
             if('14:' in brackets[y+1] or '01:' in brackets[y+1]):
                 doc = nlp(line)
                 for token in doc:
                     if('14:' not in token.text and '01:' not in token.text):
                         continue
                     if('14:' in token.text or '01:' in token.text):
-                        outside[i][1].append(token.text)
+                        classes[i][1].append(token.text)
         if("Co-Requisite courses:" in line):
             offsetNum = brackets[y].find('courses:')-2
             if('14:' in brackets[y][offsetNum:] or '01:' in brackets[y][offsetNum:]):
@@ -206,11 +218,11 @@ for url in urlsEE:
                     if('14:' not in token.text and '01:' not in token.text):
                         continue
                     if('14:' in token.text or '01:' in token.text):
-                        outside[i][1].append(token.text)
+                        classes[i][1].append(token.text)
             if('14:' in brackets[y+1]):
                 doc = nlp(brackets[y+1])
                 for token in doc:
-                    outside[i][1].append(token.text)
+                    classes[i][1].append(token.text)
 
 
         #end of line loop
@@ -236,7 +248,7 @@ placementCheck = False
 digitCheck = False
 
 for url in urlsMath:
-    outside.append(['',[], 'Mathematics',i])
+    classes.append(['',[], 'Mathematics',i])
 
     res = requests.get(url)
     html_page = res.content
@@ -271,7 +283,7 @@ for url in urlsMath:
     for line in brackets:
         if("Courses" in line):
             if('01:' in brackets[y+1]):
-                outside[i][0] = brackets[y+1][:11]
+                classes[i][0] = brackets[y+1][:11]
         if("Prerequisite" in line):
             prereqPos = line.find(':')
             doc = nlp(brackets[y][prereqPos:])
@@ -281,7 +293,14 @@ for url in urlsMath:
                 if(any(char.isdigit() for char in token.text) == False):
                     continue
                 else:
-                    outside[i][1].append(token.text)
+                    if('CALC2' in token.text):
+                        classes[i][1].append("01:640:152")
+                        continue
+                    elif('CALC3' in token.text):
+                        classes[i][1].append("01:640:251")
+                        continue
+                    else:
+                        classes[i][1].append(token.text)
 
         #end of line loop
         y+=1
@@ -289,9 +308,9 @@ for url in urlsMath:
     #end of url loop
     i+=1
 
-outside.append(['01:640:338',['01:640:250','01:640:251','01:640:477', '01:198:206', '01:960:381'], 'Mathematics',i])
+classes.append(['01:640:338',['01:640:250','01:640:251','01:640:477', '01:198:206', '01:960:381'], 'Mathematics',i])
 i+=1
-outside.append(['01:640:348', ['01:640:250','01:640:300','01:640:356','01:640:477'],'Mathematics',i])
+classes.append(['01:640:348', ['01:640:250','01:640:300','01:640:356','01:640:477'],'Mathematics',i])
 i+=1
 #END OF Mathematics
 
@@ -335,13 +354,13 @@ namesPhil = ['Applied Symbolic Logic',
              '01:730:424']
 
 for name in namesPhil:
-    outside.append(['',[], 'Philosophy',i])
+    classes.append(['',[], 'Philosophy',i])
 
     if("01:" not in name):
-        outside[i][0] = '01:730:315'
+        classes[i][0] = '01:730:315'
     if("01:" in name):
         namePos = name.find("01:")
-        outside[i][0] = name[namePos:namePos+11]
+        classes[i][0] = name[namePos:namePos+11]
 
 
     y = 0
@@ -354,14 +373,14 @@ for name in namesPhil:
                 doc = nlp(brackets[ctr])
                 for token in doc:
                     if(any(char.isdigit() for char in token.text)):
-                        outside[i][1].append(token.text)
+                        classes[i][1].append(token.text)
                     if(token.text == '.'):
                         break
             elif("01:" in brackets[ctr+1]):
                 doc = nlp(brackets[ctr+1])
                 for token in doc:
                     if(any(char.isdigit() for char in token.text)):
-                        outside[i][1].append(token.text)
+                        classes[i][1].append(token.text)
                     if(token.text == '.'):
                         break
         y+=1
@@ -377,7 +396,7 @@ for name in namesPhil:
 
 
 #start of Linguistics
-outside.append(['01:615:441', ['(B) Course','01:615:305','01:615:315','01:615:325','01:615:350'],'Linguistics',i])
+classes.append(['01:615:441', ['(B) Course','01:615:305','01:615:315','01:615:325','01:615:350'],'Linguistics',i])
 i+=1
 #end of Linguistics
 
@@ -395,7 +414,7 @@ placementCheck = False
 digitCheck = False
 
 for url in urlsStats:
-    outside.append(['',[], 'Statistics', i])
+    classes.append(['',[], 'Statistics', i])
 
     res = requests.get(url)
     html_page = res.content
@@ -429,7 +448,7 @@ for url in urlsStats:
     y = 0
     for line in brackets:
         if(y==0):
-            outside[i][0] = line[0:11]
+            classes[i][0] = line[0:11]
         if("Prerequisite" in line):
             prereqPos = line.find(':')
             doc = nlp(brackets[y][prereqPos:])
@@ -439,23 +458,69 @@ for url in urlsStats:
                 if(any(char.isdigit() for char in token.text) == False):
                     continue
                 else:
-                    outside[i][1].append(token.text)
+                    classes[i][1].append(token.text)
 
         #end of line loop
         y+=1
-    if not outside[i][1]:
-        outside[i][1].append('Level 2')
+    if not classes[i][1]:
+        classes[i][1].append('Level 2')
+
+
+
     #end of url loop
     i+=1
 
 
 #END OF Statistics
 
+'''
+    tempLength = len(classes[i][1])
+    for counter in range(tempLength):
+        if(any(char.isdigit() for char in classes[i][1][counter])):
+            count = 0
+            for ab in classes[i][1][counter]:
+                if ab == ':':
+                    count = count + 1
+
+            if(count == 0):
+                classes[i][1]+=("01:960:" + classes[i][1][counter])
+                classes[i][1].remove(classes[i][1][counter])
+                counter-=1
+            if(count == 1):
+                classes[i][1]+=("01:" + classes[i][1][counter])
+                classes[i][1].remove(classes[i][1][counter])
+                counter-=1
+'''
+
+'''
+final = []
+
+finalCtr = 0
+for anElement in classes:
+    final.append(['',[],'',0])
+    final[finalCtr][0]= anElement[0]
+    final[finalCtr][2] = anElement[2]
+    final[finalCtr][3] = anElement[3]
+    for singleElem in anElement[1]:
+        if(any(char.isdigit() for char in singleElem)):
+            count = 0
+            for ab in singleElem:
+                if ab == ':':
+                    count = count + 1
+
+            if(count == 0):
+                final[finalCtr][1].append("01:960:" + singleElem)
+            if(count == 1):
+                final[finalCtr][1].append("01:" + singleElem)
+            if(count == 2):
+                final[finalCtr][1].append(singleElem)
+        else:
+            final[finalCtr][1].append(singleElem)
+
+
+print(classes)
+'''
 
 
 
-
-
-
-
-print(outside)
+print(final)

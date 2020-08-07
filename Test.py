@@ -24,7 +24,7 @@ with open('CocaCola.csv','r') as csv_file:
         print(row)
 '''
 print("tokens")
-about_text = ('Prerequisites: 01:640:285 and (01:640:477 or 01:960:381).')
+about_text = ('Corequisite: 01:198:211 (or currently enrolled).')
 about_doc = nlp(about_text)
 for token in about_doc:
     if not token.is_stop:
